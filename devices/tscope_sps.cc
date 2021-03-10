@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 
         // Get the resolution at plane-vector position (x):
         LOG(logRESULT) << "Track resolution at DUT with " << dut_x0 << "% X0: " << mytel.getResolution(3);
-            resolution->SetPoint(j,dut_x0*100,mytel.getResolution(3));
+        resolution->SetPoint(j,dut_x0*100,mytel.getResolution(3));
         j++;
     }
 
