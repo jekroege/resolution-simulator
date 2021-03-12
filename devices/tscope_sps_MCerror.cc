@@ -7,6 +7,7 @@
 #include "TString.h"
 #include "TFile.h"
 #include "TRandom.h"
+#include "TRandom3.h"
 
 #include "assembly.h"
 #include "propagate.h"
@@ -35,6 +36,11 @@ int main(int argc, char* argv[]) {
     Log::ReportingLevel() = Log::FromString("INFO");
 
     int mode;
+    if(argc == 1) {
+        std::cout << "Please choose a mode!" << std::endl;
+        return 0;
+    }
+
     for (int i = 1; i < argc; i++) {
         // Setting verbosity:
         if (std::string(argv[i]) == "-v") {
@@ -44,10 +50,10 @@ int main(int argc, char* argv[]) {
             mode = atoi(argv[i]);
             if(mode == 0) {
                 std::cout << "Please choose your mode:" << std::endl;
-                std::cout << "\t0: 7 Timepix3 planes, DUT = APX" << std::endl;
-                std::cout << "\t1: 6 Timepix3 planes, DUT = APX" << std::endl;
-                std::cout << "\t0: 7 Timepix3 planes, DUT = CP2" << std::endl;
-                std::cout << "\t1: 6 Timepix3 planes, DUT = CP2" << std::endl;
+                std::cout << "\t1: 7 Timepix3 planes, DUT = APX" << std::endl;
+                std::cout << "\t2: 6 Timepix3 planes, DUT = APX" << std::endl;
+                std::cout << "\t3: 7 Timepix3 planes, DUT = CP2" << std::endl;
+                std::cout << "\t4: 6 Timepix3 planes, DUT = CP2" << std::endl;
                 return 0;
             }
             std::cout << "You chose mode = " << mode << std::endl;
@@ -90,15 +96,14 @@ int main(int argc, char* argv[]) {
     double X_DUT;
     double ERR_X_DUT;
     if(mode == 1 || mode == 2) {
-        X_DUT = 0.985e-2; // thickness = 62um
-        ERR_X_DUT = X_DUT*0.1;
+        // X_DUT = 0.985e-2; // thickness = 62um (my calculation)
+        X_DUT = 1.025e-2; // thickness = 100um (my calculation)
+        ERR_X_DUT = 0.5e-2;
     }
     if(mode == 3 || mode == 4 ) {
         X_DUT = 2.4e-2; // CLICpix2 -> See PhD thesis Morag Williams
-        // ERR_X_DUT = X_DUT*0.1;
         ERR_X_DUT = 0.5e-2;
     }
-    // double X_DUT = 1.025e-2; // thickness = 100um
 
     //      D04  E04  G02      DUT      G03  J05  L09  F09
     // beam  |    |    |        |        |    |    |    |
@@ -129,17 +134,14 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------------
     // Build the trajectory through the telescope device:
 
-    TRandom* rand = new TRandom();
-    for(int it=0; it<10000; it++) {
+    TRandom3* rand = new TRandom3();
+    // rand->SetSeed(33333);
+    for(int it=0; it<1e4; it++) {
 
         // Prepare the DUT (no measurement, just scatterer
         plane dut(rand->Gaus(Z_DUT,ERR_Z),
                   rand->Gaus(X_DUT,ERR_X_DUT),
                   false);
-        // plane dut(Z_DUT,ERR_Z,
-        //           X_DUT,ERR_X_DUT,
-        //           false);
-
 
         // Telescope setup:
         std::vector<plane> tpx3_tel;
@@ -150,12 +152,7 @@ int main(int argc, char* argv[]) {
                                         true,
                                         rand->Gaus(RES,ERR_RES)));
         }
-        // for(int i = 0; i < Z_TEL.size(); i++) {
-            // tpx3_tel.emplace_back(plane(Z_TEL.at(i),
-            //                             X_TPX3,
-            //                             true,
-            //                             RES));
-        // }
+
         // Duplicate the planes vector and add the current DUT:
         std::vector<plane> planes = tpx3_tel;
         planes.emplace_back(dut);
@@ -177,9 +174,11 @@ int main(int argc, char* argv[]) {
     hResolution->GetXaxis()->SetRangeUser(mean-5*sigma,mean+5*sigma);
 
     hResolution->Fit("gaus");
-    // TF1* func = hResolution->GetFunction("gaus");
-    // double mean = func->GetParameter(1);
-    // double sigma = func->GetParameter(2);
+    TF1* func = hResolution->GetFunction("gaus");
+    double fMean = func->GetParameter(1);
+    double fSigma = func->GetParameter(2);
+
+    std::cout << std::setprecision(4) << "Track poiinting resolution (mean+/-sigma): " << fMean << "+/-" << fSigma << "um" << std::endl;
 
 
     if(mode == 1) {
