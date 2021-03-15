@@ -57,6 +57,9 @@ int main(int argc, char* argv[]) {
                 std::cout << "\t4: (June 2019) 6 Mimosa26 + Timepix3, DUT = CP2" << std::endl;
                 std::cout << "\t5: (July 2019) 6 Mimosa26, DUT = APX" << std::endl;
                 std::cout << "\t6: (July 2019) 6 Mimosa26 + Timepix3, DUT = APX" << std::endl;
+                std::cout << "\t7: (August 2020) 6 Mimosa26 + Timepix3, DUT = APX -- NARROW" << std::endl;
+                std::cout << "\t8: (August 2020) 6 Mimosa26 + Timepix3, DUT = APX -- WIDE 1" << std::endl;
+                std::cout << "\t9: (August 2020) 6 Mimosa26 + Timepix3, DUT = APX -- WIDE 2" << std::endl;
                 return 0;
             }
             std::cout << "You chose mode = " << mode << std::endl;
@@ -72,6 +75,16 @@ int main(int argc, char* argv[]) {
         out = TFile::Open("output/desy-resolution-june2019_cp2_M26.root","RECREATE");
     } else if(mode == 4){
         out = TFile::Open("output/desy-resolution-june2019_cp2_M26+TPX3.root","RECREATE");
+    } else if(mode == 5){
+        out = TFile::Open("output/desy-resolution-july2019_apx_M26+TPX3.root","RECREATE");
+    } else if(mode == 6){
+        out = TFile::Open("output/desy-resolution-july2019_apx_M26+TPX3.root","RECREATE");
+    } else if(mode == 7){
+        out = TFile::Open("output/desy-resolution-aug2020_apx_M26+TPX3_narrow.root","RECREATE");
+    } else if(mode == 8){
+        out = TFile::Open("output/desy-resolution-aug2020_apx_M26+TPX3_wide1.root","RECREATE");
+    } else if(mode == 9){
+        out = TFile::Open("output/desy-resolution-aug2020_apx_M26+TPX3_wide2.root","RECREATE");
     } else {
         std::cout << "Invalid mode...try again..." << std::endl;
     }
@@ -108,17 +121,16 @@ int main(int argc, char* argv[]) {
     // ATLASpix_Simple radiation length (see PhD thesis Jens Kroeger)
     double X_DUT;
     double ERR_X_DUT;
-    if(mode == 1 || mode == 2) {
+    if(mode == 3 || mode == 4 ) {
+        // CLICpix2:
+        X_DUT = 2.4e-2; // CLICpix2 -> See PhD thesis Morag Williams
+        ERR_X_DUT = 0.5e-2;
+    } else {
+        // ATLASpix:
         // X_DUT = 0.985e-2; // thickness = 62um (my calculation)
         X_DUT = 1.025e-2; // thickness = 100um (my calculation)
         ERR_X_DUT = 0.5e-2;
-        // ERR_X_DUT = 0.1e-3;
     }
-    if(mode == 3 || mode == 4 ) {
-        X_DUT = 2.4e-2; // CLICpix2 -> See PhD thesis Morag Williams
-        ERR_X_DUT = 0.5e-2;
-    }
-    // double X_DUT = 1.025e-2; // thickness = 100um
 
     //      M26_0  M26_1  M26_2  DUT  M26_3  M26_4  M26_5  TPX3_0
     // beam  |      |       |     |     |     |      |       |
@@ -128,7 +140,7 @@ int main(int argc, char* argv[]) {
 
     // Positions of telescope planes in mm:
     std::vector<double> Z_TEL;
-    double Z_TPX;
+    double Z_TPX3;
 
     // Position of the DUT in mm:
     double Z_DUT;
@@ -137,21 +149,51 @@ int main(int argc, char* argv[]) {
         Z_TEL.emplace_back(0);
         Z_TEL.emplace_back(153);
         Z_TEL.emplace_back(305);
-        Z_DUT = 333;
+        Z_DUT =            333;
         Z_TEL.emplace_back(344);
         Z_TEL.emplace_back(456);
         Z_TEL.emplace_back(576);
-        Z_TPX3 = 666;
+        Z_TPX3 =           666;
     } else if (mode == 5 || mode == 6) {
         // July 2019
         Z_TEL.emplace_back(0);
         Z_TEL.emplace_back(153);
         Z_TEL.emplace_back(305);
-        Z_DUT = 331;
+        Z_DUT =            331;
         Z_TEL.emplace_back(345);
         Z_TEL.emplace_back(455);
         Z_TEL.emplace_back(565);
-        Z_TPX3 = 629;
+        Z_TPX3 =           629;
+    } else if (mode == 7) {
+        // August 2020 - NARROW
+        Z_TEL.emplace_back(0);
+        Z_TEL.emplace_back(278);
+        Z_TEL.emplace_back(305);
+        Z_DUT =            340;
+        Z_TEL.emplace_back(354);
+        Z_TEL.emplace_back(381);
+        Z_TEL.emplace_back(627);
+        Z_TPX3 =           672;
+    } else if (mode == 8) {
+        // August 2020 - WIDE 1
+        Z_TEL.emplace_back(0);
+        Z_TEL.emplace_back(278);
+        Z_TEL.emplace_back(305);
+        Z_DUT =            365;
+        Z_TEL.emplace_back(436);
+        Z_TEL.emplace_back(462);
+        Z_TEL.emplace_back(709);
+        Z_TPX3 =           754;
+    } else if (mode == 9) {
+        // August 2020 - WIDE 2
+        Z_TEL.emplace_back(0);
+        Z_TEL.emplace_back(278);
+        Z_TEL.emplace_back(305);
+        Z_DUT =            377;
+        Z_TEL.emplace_back(481);
+        Z_TEL.emplace_back(507);
+        Z_TEL.emplace_back(754);
+        Z_TPX3 =           799;
     }
     double ERR_Z = 1.0;
 
