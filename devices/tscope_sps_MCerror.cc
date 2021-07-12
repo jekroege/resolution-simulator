@@ -97,7 +97,10 @@ int main(int argc, char* argv[]) {
     double ERR_X_DUT;
     if(mode == 1 || mode == 2) {
         // X_DUT = 0.985e-2; // thickness = 62um (my calculation)
-        X_DUT = 1.025e-2; // thickness = 100um (my calculation)
+        // X_DUT = 0.99e-2; // thickness = 62um (my calculation)
+
+        // X_DUT = 1.025e-2; // thickness = 100um (my calculation)
+        X_DUT = 1.03e-2; // thickness = 100um (my calculation)
         ERR_X_DUT = 0.5e-2;
     }
     if(mode == 3 || mode == 4 ) {

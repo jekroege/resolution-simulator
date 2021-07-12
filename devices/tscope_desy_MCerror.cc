@@ -115,8 +115,10 @@ int main(int argc, char* argv[]) {
 
     // The intrinsic resolution has been measured to be around 12.75um
     // (also see PhD thesis Niloufar Tehrani):
-    double RES_TPX3 = 12.75e-3; // in mm
-    double ERR_RES_TPX3 = 0.01e-3; // in mm
+    // double RES_TPX3 = 12.75e-3; // in mm
+    double RES_TPX3 = 12.8e-3; // in mm
+    // double ERR_RES_TPX3 = 0.01e-3; // in mm
+    double ERR_RES_TPX3 = 1.0e-3; // in mm
 
     // ATLASpix_Simple radiation length (see PhD thesis Jens Kroeger)
     double X_DUT;
